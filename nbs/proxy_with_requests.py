@@ -19,7 +19,7 @@
 
 # %%
 from ipstartup import *
-from sm.search import *
+from mproxy import Mproxy, Proxysearch, Stypes
 import requests
 from fake_useragent import UserAgent
 from time import sleep

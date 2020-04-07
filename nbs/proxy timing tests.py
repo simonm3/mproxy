@@ -16,12 +16,12 @@
 # # Tests of different search methods
 # Conclusions:
 #
-# * duckduckgo is 4 times as fast as google
-# * using a session is twice as fast as not
+# * mostly duckduckgo is much faster than google. however it depends on time of day.
+# * mostly using a session is faster than not using a session
 
 # %%
 from ipstartup import *
-from sm.search import *
+from mproxy import Mproxy, Proxysearch
 import requests
 from fake_useragent import UserAgent
 m = Mproxy()
@@ -38,11 +38,11 @@ m.start(2)
 url = "http://www.google.com/search"
 
 # %%
-# without proxy_url
+# without proxy
 # %timeit requests.get(url, params=dict(q=np.random.randint(100000)))
 
 # %%
-# proxy_url
+# proxy
 proxies=dict(http=m.get_proxy_url())
 # %timeit r = requests.get(url,\
 #                          params=dict(q=np.random.randint(100000)),\
@@ -50,7 +50,7 @@ proxies=dict(http=m.get_proxy_url())
 #                          proxies=proxies)
 
 # %%
-# proxy_url with session
+# proxy with session
 s = requests.session()
 s.headers=dict(User_Agent=UserAgent().chrome)
 s.proxies=dict(http=m.get_proxy_url())
@@ -63,11 +63,11 @@ s.proxies=dict(http=m.get_proxy_url())
 url = "http://www.duckduckgo.com"
 
 # %%
-# without proxy_url
+# without proxy
 # %timeit requests.get(url, params=dict(q=np.random.randint(100000)))
 
 # %%
-# proxy_url
+# proxy
 proxies=dict(http=m.get_proxy_url())
 # %timeit r = requests.get(url,\
 #                          params=dict(q=np.random.randint(100000)),\
@@ -75,8 +75,10 @@ proxies=dict(http=m.get_proxy_url())
 #                          proxies=proxies)
 
 # %%
-# proxy_url with session
+# proxy with session
 s = requests.session()
 s.headers=dict(User_Agent=UserAgent().chrome)
 s.proxies=dict(http=m.get_proxy_url())
 # %timeit r = s.get(url, params=dict(q=np.random.randint(100000)))
+
+# %%
