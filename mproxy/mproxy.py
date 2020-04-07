@@ -36,10 +36,6 @@ def subprocess_run(cmd, **kwargs):
 class Mproxy:
     """ manages a rotating set of http proxy_url servers. has no fixed state as it refreshes from aws
 
-    requires:
-    * ~/.aws folder containing "credentials" and "key"
-    * securitygroup "proxy_url" that opens inbound ports 22 and 8080 (ssh and proxy_url requests)
-
     each proxy_url uses aws spot instances and ebs volumes (<1c/proxy_url/hour)
     does not use any aws resources when not running
     """
