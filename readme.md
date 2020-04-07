@@ -21,14 +21,14 @@ See nbs folder for example::
 Classes
 -------
 
-mproxy represents all the running proxies. it initialises from aws so can be created any time.
-proxysearch represents a search session. It uses one proxy that will be replaced when it fails.
+* mproxy represents all the running proxies. it initialises from aws so can be created any time.
+* proxysearch represents a search session. It uses one proxy that will be replaced when it fails.
 
 how many proxies are needed?
 ----------------------------
 
-you can use mproxy.set(n) at any time to set the number of running proxies.
-1 proxy means that when it fails there is a delay until replacement is ready.
-2 proxies means that when it fails it switches to proxy 2 immediately and relaunches proxy 1 in the background.
->2 proxies can cope with more frequent requests and failures without delays.
+* you can use mproxy.set(n) at any time to set the number of running proxies.
+* 1 proxy means that when it fails there is a delay until replacement is ready.
+* 2 proxies means that when it fails it switches to proxy 2 immediately and relaunches proxy 1 in the background.
+* \>2 proxies can cope with more frequent requests and failures without delays.
 Proxies can be shared by multiple threads and processes.
