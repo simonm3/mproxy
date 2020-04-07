@@ -8,8 +8,8 @@ from setuptools import setup
 
 params = dict(
     name='mproxy',
-    description='mproxy',
-    version='0.0.0',
+    description='Mproxy',
+    version='0.0.1',
     url='https://github.com/simonm3/mproxy.git',
     install_requires=['Twisted', 'aws2', 'beautifulsoup4',
                       'fake_useragent', 'pandas', 'requests'],
