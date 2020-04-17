@@ -1,2 +1,3 @@
 from .mproxy import Mproxy
-from .proxysearch import Proxysearch, Stypes
+from .search import Search, Stypes
+from .proxysearch import Proxysearch

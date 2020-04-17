@@ -1,8 +1,14 @@
 from functools import wraps
 from time import sleep
 
+import logging
+
+log = logging.getLogger(__name__)
+
+
 class RetryException(Exception):
     pass
+
 
 class Retry:
     """ decorator to retry a function """
@@ -29,10 +35,15 @@ class Retry:
                     if self.exceptions and not isinstance(e, self.exceptions):
                         raise
                     if self.warn > 0:
-                        log.warning(f"failed {func.__name__}. retrying {self.retry} times")
+                        log.warning(
+                            f"waiting for {func.__module__}.{func.__name__}"
+                        )
                         self.warn -= 1
-                    if n == self.retry-1:
-                        log.error(f"{func.__name__} attempted {self.retry} times and failed")
+                    if n == self.retry - 1:
+                        log.error(
+                            f"{func.__module__}.{func.__name__} attempted {self.retry} times and failed"
+                        )
                         raise
                 sleep(self.delay)
+
         return inner
