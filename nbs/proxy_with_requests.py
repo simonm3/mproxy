@@ -19,7 +19,7 @@
 
 # %%
 from ipstartup import *
-from mproxy import Mproxy, Proxysearch, Stypes
+from mproxy import Mproxy, Search, Stypes
 import requests
 from fake_useragent import UserAgent
 from time import sleep
@@ -34,7 +34,7 @@ m.wait(2)
 m.df
 
 # %%
-# get a proxy_url url
+# get a proxy url
 m.get_proxy_url()
 
 # %% [markdown]
@@ -43,7 +43,7 @@ m.get_proxy_url()
 # %%
 # call requests.get as normal with the proxies parameter
 proxy_url = m.get_proxy_url()
-proxies=dict(http=proxy_url)
+proxies = dict(http=proxy_url)
 url = "http://api.ipify.org"
 r = requests.get(url, headers=dict(User_Agent=UserAgent().chrome), proxies=proxies)
 print(proxy_url)

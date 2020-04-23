@@ -17,7 +17,7 @@
 
 # %%
 from ipstartup import *
-from mproxy import  Mproxy, Proxysearch
+from mproxy import Mproxy, Search
 
 # %%
 # set the number of proxy servers and wait until ready (they setup in the background)
@@ -30,11 +30,11 @@ m.wait(2)
 m.df
 
 # %%
-# create proxysearch. this is a session that uses one proxy but replaces on failure.
-s = Proxysearch(m)
+# create proxysearch. this is a translator that uses one proxy but replaces on failure.
+s = Search(m)
 
 # %%
-# search using google. if this cell fails then rerun will try again with new proxy_url.
+# search using google. if this cell fails then rerun will try again with new proxy.
 # maximum 300 results per search. can be increased by running separate searches per week.
 q = "sport"
 n = 1000
