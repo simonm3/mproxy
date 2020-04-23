@@ -7,23 +7,20 @@ overwritten when autogen is rerun.
 from setuptools import setup
 
 params = dict(
-    name='mproxy',
-    description='Mproxy',
-    version='0.0.1',
-    url='https://github.com/simonm3/mproxy.git',
-    install_requires=['Twisted', 'aws2', 'beautifulsoup4',
-                      'fake_useragent', 'pandas', 'requests'],
-    packages=['mproxy'],
-    package_data={'mproxy': [
-        'babies-first-names-top-100-girls.csv', 'proxy.yaml']},
+    name="mproxy",
+    description="Mproxy",
+    version="0.0.1",
+    url="http://github.com:simonm3/mproxy.git",
+    install_requires=["aws2", "beautifulsoup4", "fake_useragent", "pandas", "requests"],
+    packages=["mproxy"],
+    package_data={"mproxy": ["babies-first-names-top-100-girls.csv", "server.yaml"]},
     include_package_data=True,
     py_modules=[],
-    scripts=None)
+    scripts=None,
+)
 
 ########## EDIT BELOW THIS LINE ONLY ##########
 
-# only used for remote server
-params["install_requires"].remove("Twisted")
 
 ########## EDIT ABOVE THIS LINE ONLY ##########
 

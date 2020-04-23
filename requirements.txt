@@ -1,7 +1,6 @@
-Twisted==20.3.0
-fake_useragent==0.1.11
 requests==2.22.0
-aws2.egg==info
-pandas==1.0.3
+pandas==1.0.1
 aws2==0.2.5
 beautifulsoup4==4.9.0
+fake_useragent==0.1.11
+Twisted==20.3.0

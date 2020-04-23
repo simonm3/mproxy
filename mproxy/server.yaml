@@ -1,4 +1,4 @@
-# aws spot instance configuration for proxy_url server
+# aws spot instance configuration for proxy server
 BlockDeviceMappings:
 - DeviceName: /dev/sda1
   Ebs:

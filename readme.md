@@ -8,7 +8,7 @@ Installation
 ------------
 
     ~/.aws folder containing "config", credentials" and "key"
-    aws securitygroup "proxy" that opens inbound ports 22 and 8080 (ssh and proxy requests)
+    aws securitygroup "proxy" that opens inbound ports 22 and 8888 (ssh and proxy requests)
     pip install mproxy
 
 Usage
@@ -21,8 +21,9 @@ See nbs folder for example::
 Classes
 -------
 
-* mproxy represents all the running proxies. it initialises from aws so can be created any time.
-* proxysearch represents a search session. It uses one proxy that will be replaced when it fails.
+* Mproxy represents all the running proxies. it initialises from aws so can be created any time.
+* Search represents a search session. It uses one proxy that will be replaced when it fails.
+* Translate represents a translate session. It uses one proxy that will be replaced when it fails.
 
 how many proxies are needed?
 ----------------------------
@@ -31,4 +32,5 @@ how many proxies are needed?
 * 1 proxy means that when it fails there is a delay until replacement is ready.
 * 2 proxies means that when it fails it switches to proxy 2 immediately and relaunches proxy 1 in the background.
 * \>2 proxies can cope with more frequent requests and failures without delays.
-Proxies can be shared by multiple threads and processes.
+Proxies can be shared by multiple threads and processes; and by search and translate.
+
