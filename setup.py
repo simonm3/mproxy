@@ -9,8 +9,8 @@ from setuptools import setup
 params = dict(
     name='mproxy',
     description='Mproxy',
-    version='0.0.2',
-    url='http://github.com:simonm3/mproxy.git',
+    version='0.0.3',
+    url='https://github.com/simonm3/mproxy.git',
     install_requires=['aws2', 'beautifulsoup4',
                       'googletrans', 'pandas', 'requests'],
     packages=['mproxy'],
