@@ -97,7 +97,6 @@ class Search:
 
         todo: tld, country no longer work. may need to change settings via selenium as done via cookies even incognito
         todo thread pages. separate url parse and get OR batch request urls with callback
-        todo request limit exceeded describe instances?
         """
         # date range
         tbs = ""
@@ -122,12 +121,12 @@ class Search:
         if domain:
             query = f"site:{domain} {query}"
 
-        # results/page=num-1. maximum 100 which returns up to 99 results.
+        # results per page=num-1. maximum num=100 which returns up to 99 results.
         path = "/search"
         params = dict(
             q=query,
             hl=lang,
-            num=100,
+            num=min(n, 100),
             start=start,
             tbs=tbs,
             safe=safe,
@@ -142,9 +141,11 @@ class Search:
             # get page. must be https to include date search.
             r = self.get(f"https://google.com{path}", params=params)
 
-            # extract urls
+            # extract urls from page
             soup = BeautifulSoup(r.text, "lxml")
             urls.extend(self.extract_urls(soup))
+
+            # dedupe
             urls = list(dict.fromkeys(urls))
 
             # limit reached
