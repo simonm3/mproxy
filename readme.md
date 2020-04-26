@@ -18,6 +18,25 @@ See nbs folder for example::
 
     proxy_search.ipynb - search using automatic proxy replacement
     
+Multiprocessing usage::
+
+    # for main process
+    m = Mproxy.create_server()
+    
+    # for other processes
+    m = Mproxy.create_client()
+    s = Search(m)
+    r = s.search("some stuff")
+
+Todo
+----
+
+* run mproxy as server that accepts http requests; sends them as https; responds using http.
+Note it cannot be https end to end and still change request or response headers
+* rotate proxies or allocate them in other ways
+* with 8 processes using 8 proxies they all expire at the same time 
+* does not work with google translate which somehow detects the new proxy
+    
 Classes
 -------
 

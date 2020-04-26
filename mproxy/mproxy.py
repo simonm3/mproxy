@@ -237,7 +237,7 @@ class Mproxy:
 
     @classmethod
     def create_server(cls):
-        # todo move all this to utils
+        # todo replace with mp_object
         """ create server for proxy object so it can be accessed from multiple processes
         :return: actual object for use in calling process
         todo consider using spot fleet instead to ensure enough proxies
