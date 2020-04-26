@@ -11,6 +11,8 @@ log = logging.getLogger(__name__)
 class Translate:
     """ mproxy client for google translate
 
+    todo this does not currently work as google recognises proxy switches even if elite
+
     Usage::
 
         t = Translate(mproxy)
@@ -51,6 +53,7 @@ class Translate:
         """
         :return: translated text
         """
+        raise NotImplementedError("this does not currently work as google recognises proxy switches even if elite")
         while True:
             try:
                 log.info(f"translating {src} to {dest} for {text[:100]}")
