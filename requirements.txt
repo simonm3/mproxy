@@ -1,6 +1,4 @@
+pandas==1.0.3
 googletrans==2.4.0
-pandas==1.0.1
 requests==2.22.0
-aws2.egg==info
-aws2==0.2.5
-beautifulsoup4==4.9.0
+beautifulsoup4==4.8.2

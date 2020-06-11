@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+import logging
+from datetime import datetime, timedelta
+from urllib.parse import parse_qs, urlparse
 
 import requests
-from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse, parse_qs
-from . import ua, uacode
 
-import logging
+from .mproxy import ProxyException, ua
+from .utils import Retry
 
 log = logging.getLogger(__name__)
 
@@ -29,6 +29,11 @@ class Search:
 
         s = Search(mproxy)
         s.search("something")
+
+    Test search only without proxy::
+
+        s = Search()
+        s.search("something)
     """
 
     def __init__(self, mproxy=None):
@@ -38,38 +43,8 @@ class Search:
         self.mproxy = mproxy
         if mproxy is None:
             self.session = requests.session()
-            self.session.headers = {"User-Agent": ua}
         else:
-            self.mproxy = mproxy
             self.session = self.mproxy.get_session()
-            self.proxy = self.session.proxies["http"]
-        self.session.trust_env = False
-
-    def refresh(self):
-        """ refresh with a new proxy """
-        self.mproxy.replace(self.proxy)
-        self.session.close()
-        self.session = self.mproxy.get_session()
-
-        # fail if google search not responding
-        r = self.session.get(f"https://google.com/search?q=something")
-        r.raise_for_status()
-
-    def get(self, url, params):
-        """ get with proxy replacement for google search """
-        while True:
-            try:
-                r = self.session.get(url, params=params, timeout=7)
-                r.raise_for_status()
-                return r
-            except Exception as e:
-                if self.mproxy is None:
-                    raise
-                # get new proxy and try again
-                log.warning(
-                    f"api limit reached. replacing {self.proxy}. exception={type(e)}"
-                )
-                self.refresh()
 
     def search(
         self,
@@ -85,7 +60,7 @@ class Search:
     ):
         """ search google and return list of urls
         :param query: search string
-        :param safe: no porn
+        :param safe: "on" filters porn and other things
         :param n: number of results. 99/page so 100 returns 198.
         :param start: index of first result
         :param lang: language
@@ -96,7 +71,6 @@ class Search:
         :return: list of urls
 
         todo: tld, country no longer work. may need to change settings via selenium as done via cookies even incognito
-        todo thread pages. separate url parse and get OR batch request urls with callback
         """
         # date range
         tbs = ""
@@ -139,11 +113,11 @@ class Search:
         urls = []
         while True:
             # get page. must be https to include date search.
-            r = self.get(f"https://google.com{path}", params=params)
+            r = self._get(f"https://google.com{path}", params=params)
 
             # extract urls from page
             soup = BeautifulSoup(r.text, "lxml")
-            urls.extend(self.extract_urls(soup))
+            urls.extend(self._extract_urls(soup))
 
             # dedupe
             urls = list(dict.fromkeys(urls))
@@ -156,28 +130,16 @@ class Search:
             path = None
             params = None
             try:
-                if uacode == "win10":
-                    path = soup.find(id="pnnext").get("href")
-
-                elif uacode == "requests":
-                    path = [
-                        a
-                        for a in soup.find_all("a")
-                        if a.get("aria-label") == "Next page"
-                    ][0].get("href")
-                elif uacode == "win6":
-                    path = [a for a in soup.find_all("a") if a.text == "Next\xa0>"][
-                        0
-                    ].get("href")
-                else:
-                    raise Exception("ua code is required")
+                path = soup.find(id="pnnext").get("href")
             except:
                 pass
             if not path:
                 break
         return list(urls)
 
-    def extract_urls(self, soup):
+    ######################################################################
+
+    def _extract_urls(self, soup):
         """ return search result urls from page """
         urls = []
         links = soup.findAll("a")
@@ -192,3 +154,37 @@ class Search:
             if o.netloc and "google" not in o.netloc:
                 urls.append(url)
         return urls
+
+    def _refresh(self):
+        """ refresh with a new proxy """
+        if not self.mproxy:
+            return
+
+        # new session
+        self.mproxy.replace(self.session.proxies["http"])
+        self.session.close()
+        self.session = self.mproxy.get_session()
+
+        # check working else fail
+        urls = self.search("something")
+        if len(urls) < 5:
+            url = self.session.proxies["http"]
+            self.mproxy.stop_instance(url)
+            raise Exception(f"Proxy failed {url}")
+
+    def _get(self, url, params):
+        if not self.mproxy:
+            return self.session.get(url, params=params)
+        return self._get_mproxy(url, params)
+
+    @Retry()
+    def _get_mproxy(self, url, params):
+        """ get with proxy replacement for google search """
+        try:
+            r = self.session.get(url, params=params, timeout=7)
+            if r.status_code != 200:
+                raise ProxyException
+            return r
+        except ProxyException:
+            self._refresh()
+            raise

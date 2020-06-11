@@ -28,28 +28,21 @@ Multiprocessing usage::
     s = Search(m)
     r = s.search("some stuff")
 
-Todo
-----
-
-* run mproxy as server that accepts http requests; sends them as https; responds using http.
-Note it cannot be https end to end and still change request or response headers
-* rotate proxies or allocate them in other ways
-* with 8 processes using 8 proxies they all expire at the same time 
-* does not work with google translate which somehow detects the new proxy
-    
+   
 Classes
 -------
 
-* Mproxy represents all the running proxies. it initialises from aws so can be created any time.
+* Mproxy represents all the running proxies. it initialises from aws.
 * Search represents a search session. It uses one proxy that will be replaced when it fails.
 * Translate represents a translate session. It uses one proxy that will be replaced when it fails.
+[google translate fails as they somehow detect the replacement proxy]
 
 how many proxies are needed?
 ----------------------------
 
-* you can use mproxy.set(n) at any time to set the number of running proxies.
+* you can use mproxy.start(n) at any time to set the number of running proxies.
 * 1 proxy means that when it fails there is a delay until replacement is ready.
 * 2 proxies means that when it fails it switches to proxy 2 immediately and relaunches proxy 1 in the background.
 * \>2 proxies can cope with more frequent requests and failures without delays.
-Proxies can be shared by multiple threads and processes; and by search and translate.
+* Proxies can be shared by multiple threads and processes
 

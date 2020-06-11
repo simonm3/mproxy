@@ -15,14 +15,13 @@
 # %% [markdown]
 # # Search with automatic proxy replacement
 
-# %%
 from ipstartup import *
 from mproxy import Mproxy, Search
 
 # %%
 # set the number of proxy servers and wait until ready (they setup in the background)
 m = Mproxy()
-m.set(2)
+m.start(2)
 m.wait(2)
 
 # %%

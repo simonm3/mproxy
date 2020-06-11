@@ -11,9 +11,8 @@ params = dict(
     description='Mproxy',
     version='0.0.3',
     url='https://github.com/simonm3/mproxy.git',
-    install_requires=['aws2', 'beautifulsoup4',
-                      'googletrans', 'pandas', 'requests'],
-    packages=['mproxy'],
+    install_requires={'pandas', 'googletrans', 'requests', 'beautifulsoup4'},
+    packages=['mproxy', 'mproxy.utils'],
     package_data={'mproxy': [
         'babies-first-names-top-100-girls.csv', 'server.yaml', 'tinyproxy.conf']},
     include_package_data=True,

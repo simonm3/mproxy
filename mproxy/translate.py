@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-
-from googletrans import Translator
-import requests
 import json
 import logging
+
+import requests
+from googletrans import Translator
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ class Translate:
             self.proxy = None
             self.translator = Translator()
         else:
-            self.proxy = mproxy.get_proxy_url()
+            self.proxy = mproxy.get_url()
             # note cannot set translator.session directly as translator init passes session to other objects
             self.translator = Translator(
                 proxies=dict(http=self.proxy, https=self.proxy), timeout=7
@@ -39,7 +38,7 @@ class Translate:
         """ refresh translator session with a new proxy """
         self.mproxy.replace(self.proxy)
         self.translator.session.close()
-        self.proxy = self.mproxy.get_proxy_url()
+        self.proxy = self.mproxy.get_url()
         self.translator = Translator(
             proxies=dict(http=self.proxy, https=self.proxy), timeout=7
         )
@@ -53,7 +52,9 @@ class Translate:
         """
         :return: translated text
         """
-        raise NotImplementedError("this does not currently work as google recognises proxy switches even if elite")
+        raise NotImplementedError(
+            "this does not currently work as google recognises proxy switches even if elite"
+        )
         while True:
             try:
                 log.info(f"translating {src} to {dest} for {text[:100]}")
