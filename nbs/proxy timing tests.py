@@ -20,10 +20,10 @@
 # * mostly using a translator is faster than not using a translator
 
 import requests
-
 from fake_useragent import UserAgent
+
 from ipstartup import *
-from mproxy import Mproxy, Search
+from mproxy import Google, Mproxy
 
 m = Mproxy()
 

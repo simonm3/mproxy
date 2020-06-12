@@ -5,9 +5,6 @@ from urllib.parse import parse_qs, urlparse
 import requests
 from bs4 import BeautifulSoup
 
-from .mproxy import ProxyException, ua
-from .utils import Retry
-
 log = logging.getLogger(__name__)
 
 
@@ -17,34 +14,22 @@ class Stypes:
     images = "isch"
     news = "nws"
     videos = "vid"
-    shop = "shop"
+    shopping = "shop"
     books = "bks"
     apps = "app"
 
 
-class Search:
-    """ mproxy client for google search
+class Google:
+    """ google search
 
     Usage::
 
-        s = Search(mproxy)
-        s.search("something")
-
-    Test search only without proxy::
-
-        s = Search()
+        s = Google()
         s.search("something)
     """
 
-    def __init__(self, mproxy=None):
-        """
-        :param mproxy: mproxy object. None to search without proxies
-        """
-        self.mproxy = mproxy
-        if mproxy is None:
-            self.session = requests.session()
-        else:
-            self.session = self.mproxy.get_session()
+    def __init__(self):
+        self.session = requests.session()
 
     def search(
         self,
@@ -70,7 +55,8 @@ class Search:
         :param stype: from search.Stypes. type of search e.g. video
         :return: list of urls
 
-        todo: tld, country no longer work. may need to change settings via selenium as done via cookies even incognito
+        searches are location specific based on ip address (tld and country are ignored)
+        can change location in settings but this is encrypted so unclear how to encode
         """
         # date range
         tbs = ""
@@ -137,8 +123,6 @@ class Search:
                 break
         return list(urls)
 
-    ######################################################################
-
     def _extract_urls(self, soup):
         """ return search result urls from page """
         urls = []
@@ -155,36 +139,5 @@ class Search:
                 urls.append(url)
         return urls
 
-    def _refresh(self):
-        """ refresh with a new proxy """
-        if not self.mproxy:
-            return
-
-        # new session
-        self.mproxy.replace(self.session.proxies["http"])
-        self.session.close()
-        self.session = self.mproxy.get_session()
-
-        # check working else fail
-        urls = self.search("something")
-        if len(urls) < 5:
-            url = self.session.proxies["http"]
-            self.mproxy.stop_instance(url)
-            raise Exception(f"Proxy failed {url}")
-
     def _get(self, url, params):
-        if not self.mproxy:
-            return self.session.get(url, params=params)
-        return self._get_mproxy(url, params)
-
-    @Retry()
-    def _get_mproxy(self, url, params):
-        """ get with proxy replacement for google search """
-        try:
-            r = self.session.get(url, params=params, timeout=7)
-            if r.status_code != 200:
-                raise ProxyException
-            return r
-        except ProxyException:
-            self._refresh()
-            raise
+        return self.session.get(url, params=params)
