@@ -1,45 +1,35 @@
 import logging
 
 from .google import Google
-from .mproxy import ProxyException, ua
+from .proxyaws import ProxyException
 from .utils import Retry
 
 log = logging.getLogger(__name__)
 
-
-class Stypes:
-    """ types of results required """
-
-    images = "isch"
-    news = "nws"
-    videos = "vid"
-    shopping = "shop"
-    books = "bks"
-    apps = "app"
-
-
-class MGoogle(Google):
-    """ mproxy client for google search
+class GoogleAWS(Google):
+    """ google using aws or awsnord proxy
 
     Usage::
 
-        s = Google(mproxy)
+        s = Google(manager)
         s.search("something")
     """
 
-    def __init__(self, mproxy):
+    def __init__(self, proxy):
         """
-        :param mproxy: mproxy object
+        :param proxy: proxy manager
         """
-        self.mproxy = mproxy
-        self.session = self.mproxy.get_session()
+        self.proxy = proxy
+        self.session = self.proxy.get_session()
 
     def _refresh(self):
         """ refresh with a new proxy """
+        # replace proxy
+        self.proxy.replace(self.session.proxies["http"])
+
         # new session
-        self.mproxy.replace(self.session.proxies["http"])
         self.session.close()
-        self.session = self.mproxy.get_session()
+        self.session = self.proxy.get_session()
 
         # check working else fail
         urls = self.search("something")
