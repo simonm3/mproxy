@@ -16,11 +16,11 @@
 # # Search with automatic proxy replacement
 
 from ipstartup import *
-from mproxy import Mproxy, Search
+from mproxy import Google, ProxyAWS
 
 # %%
 # set the number of proxy servers and wait until ready (they setup in the background)
-m = Mproxy()
+m = ProxyAWS()
 m.start(2)
 m.wait(2)
 
@@ -30,7 +30,7 @@ m.df
 
 # %%
 # create proxysearch. this is a translator that uses one proxy but replaces on failure.
-s = Search(m)
+s = Google(m)
 
 # %%
 # search using google. if this cell fails then rerun will try again with new proxy.
@@ -38,7 +38,7 @@ s = Search(m)
 q = "sport"
 n = 1000
 domain = "www.guardian.co.uk"
-urls = s.search(q, n=n, domain=domain, to_date="20191230", from_date="20190101")
+urls = s.search(q, n=n, site=domain, before="20191230", after="20190101")
 len(urls), urls
 
 # %%

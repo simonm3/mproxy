@@ -23,13 +23,13 @@ import requests
 from fake_useragent import UserAgent
 
 from ipstartup import *
-from mproxy import Google, Mproxy
+from mproxy import Google, ProxyAWS
 
-m = Mproxy()
+m = ProxyAWS()
 
 # %%
 # start two proxy servers. takes a couple of minutes to start. cost is <0.1c/hour/proxy
-m = Mproxy()
+m = ProxyAWS()
 m.start(2)
 
 # %% [markdown]

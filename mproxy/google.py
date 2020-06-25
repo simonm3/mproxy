@@ -20,7 +20,7 @@ class Stypes:
 
 
 class Google:
-    """ google search
+    """ google search session
 
     Usage::
 
@@ -34,65 +34,63 @@ class Google:
     def search(
         self,
         query,
-        safe="off",
         n=10,
         start=1,
         lang="en",
-        from_date=None,
-        to_date=None,
-        domain=None,
+        after=None,
+        before=None,
+        site=None,
         stype="",
+        **kwargs,
     ):
         """ search google and return list of urls
         :param query: search string
-        :param safe: "on" filters porn and other things
         :param n: number of results. 99/page so 100 returns 198.
         :param start: index of first result
         :param lang: language
-        :param from_date: YYYYMMDD or python date. default is 365 days before today.
-        :param to_date: YYYYMMDD or python date. default is today.
-        :param domain: e.g. www.guardian.co.uk
+        :param after: YYYYMMDD; YYYY-MM-DD; python date. default is 365 days before today.
+        :param before: YYYYMMDD; YYYY-MM-DD; python date. default is today.
+        :param site: e.g. www.guardian.co.uk
         :param stype: from search.Stypes. type of search e.g. video
         :return: list of urls
 
         searches are location specific based on ip address (tld and country are ignored)
         can change location in settings but this is encrypted so unclear how to encode
         """
-        # date range
-        tbs = ""
-        if from_date or to_date:
-            # convert to datetime
-            if isinstance(from_date, str):
-                from_date = datetime.strptime(from_date, "%Y%m%d")
-            if isinstance(to_date, str):
-                to_date = datetime.strptime(to_date, "%Y%m%d")
 
-            # defaults
-            if not to_date:
-                to_date = datetime.today()
-            if not from_date:
-                from_date = to_date - timedelta(days=365)
+        def get_date(d):
+            """ allow yyyymmdd or yyyy-mm-dd or datetime"""
+            if isinstance(d, str):
+                if "-" in d:
+                    d = datetime.strptime(d, "%Y-%m-%d")
+                else:
+                    d = datetime.strptime(d, "%Y%m%d")
+            return d
 
-            # convert to str
-            from_date = from_date.strftime("%m/%d/%Y")
-            to_date = to_date.strftime("%m/%d/%Y")
-            tbs = f"cdr:1,cd_min:{from_date},cd_max:{to_date}"
+        after = get_date(after)
+        before = get_date(before)
 
-        if domain:
-            query = f"site:{domain} {query}"
+        # defaults
+        if not before:
+            before = datetime.today()
+        if not after:
+            after = before - timedelta(days=365)
+
+        # convert to str
+        after = after.strftime("%Y-%m-%d")
+        before = before.strftime("%Y-%m-%d")
+
+        if before:
+            query = f"before:{before} {query}"
+        if after:
+            query = f"after:{after} {query}"
+        if site:
+            query = f"site:{site} {query}"
 
         # results per page=num-1. maximum num=100 which returns up to 99 results.
         path = "/search"
         params = dict(
-            q=query,
-            hl=lang,
-            num=min(n, 100),
-            start=start,
-            tbs=tbs,
-            safe=safe,
-            tbm=stype,
-            btnG="Google Search",
-            cr="",
+            q=query, hl=lang, tbm=stype, start=start, num=min(n, 100), **kwargs
         )
 
         # iterate pages

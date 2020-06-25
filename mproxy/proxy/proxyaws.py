@@ -1,65 +1,46 @@
 import logging
-import multiprocessing as mp
-import os
 from threading import Thread
-from urllib.parse import urlparse
 
 import pandas as pd
 import requests
-from requests.adapters import HTTPAdapter
 
 from aws2 import Spot, aws
 
-from .utils import Retry
+from ..utils import Retry
+from ..utils.conv import ip2url, url2ip
+from .proxy import HERE, Proxy, names
 
 log = logging.getLogger(__name__)
 
-HERE = os.path.dirname(__file__)
-names = pd.read_csv(f"{HERE}/babies-first-names-top-100-girls.csv").FirstForename
-ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
 
-
-def ip2url(ip):
-    """ ip used by aws; url used by client """
-    return f"http://{ip}:8888"
-
-
-def url2ip(url):
-    """ ip used by aws; url used by client """
-    return urlparse(url).netloc.split(":")[0]
-
-
-class ProxyException(Exception):
-    """ raised when proxy is rejected """
-
-    pass
-
-
-class Borg:
-    """ simplified singleton """
-
-    _shared_state = {}
-
-    def __init__(self):
-        self.__dict__ = self._shared_state
-
-
-class Mproxy(Borg):
-    """ manages a group of https proxy servers
-    each proxy uses aws spot instances and ebs volumes (<1c/proxy/hour)
+class ProxyAWS(Proxy):
+    """ proxy using a group of AWS servers
     """
 
     def __init__(self):
         # identifies proxy instances on aws
         self.prefix = "proxy_"
 
-        # next proxy to select
+        # index of next proxy to select
         self.next = 0
 
         # master database of instances initialised from aws
         self.df = self.get_instances()
 
     # client methods ################################################################################
+
+    def get_url(self):
+        """ return next url
+        :return: proxy url
+        """
+        if self.ready.empty:
+            self.wait(1)
+
+        if self.next >= len(self.ready):
+            self.next = 0
+        ip = self.ready.ip.iloc[self.next]
+        self.next += 1
+        return ip2url(ip)
 
     def start(self, target=1):
         """ start proxies to reach target
@@ -122,33 +103,6 @@ class Mproxy(Borg):
         """ enable access from client """
         return self.df
 
-    def get_url(self):
-        """ return next url
-        :return: proxy url
-        """
-        if self.ready.empty:
-            self.wait(1)
-
-        if self.next >= len(self.ready):
-            self.next = 0
-        ip = self.ready.ip.iloc[self.next]
-        self.next += 1
-        return ip2url(ip)
-
-    def get_session(self):
-        """ return next requests session. alternative to get_url.
-        :return: requests session
-        """
-        url = self.get_url()
-        s = requests.Session()
-        adapter = HTTPAdapter(max_retries=3)
-        s.mount("http://", adapter)
-        s.mount("https://", adapter)
-        s.headers = {"User-Agent": ua}
-        s.proxies = dict(http=url, https=url)
-        s.trust_env = False
-        return s
-
     # internal methiods ###################################################################################
 
     @property
@@ -177,8 +131,11 @@ class Mproxy(Borg):
         """
         # create instance
         name = names.sample(1).item().lower()
+
         i = Spot(f"{self.prefix}{name}", specfile=f"{HERE}/server.yaml")
         i.persistent = False
+
+        ################################################################
 
         # configure instance
         i.set_connection()
@@ -188,7 +145,7 @@ class Mproxy(Borg):
             "sudo apt-get -y -q install dos2unix tinyproxy && "
             "dos2unix tinyproxy.conf && "
             "sudo cp tinyproxy.conf /etc/tinyproxy/tinyproxy.conf && "
-            "sudo service tinyproxy restart",
+            "sudo service tinyproxy restart &&",
             hide="both",
         )
         i.connection.close()

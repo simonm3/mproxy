@@ -1,8 +1,10 @@
 import logging
 import os
 import pandas as pd
+from requests.adapters import HTTPAdapter
+import requests
 
-from .utils import Retry
+from mproxy.utils import Retry
 
 log = logging.getLogger(__name__)
 
@@ -18,16 +20,29 @@ class ProxyException(Exception):
 
 
 class Proxy:
-    """ proxy using a group of AWS servers
+    """ base class for proxy managers
     """
+
     def get_session(self):
         """ return next requests session. alternative to get_url.
         :return: requests session
         """
-        # define in child class
-        raise NotImplementedError
+        s = requests.session()
+        adapter = HTTPAdapter(max_retries=3)
+        s.mount("http://", adapter)
+        s.mount("https://", adapter)
+        s.headers = {"User-Agent": ua}
+        proxy = self.get_url()
+        s.proxies = dict(http=proxy, https=proxy)
+        s.trust_env = False
+        return s
 
-    # optional #######################################################
+    def get_url(self):
+        """ return next url
+        :return: proxy url
+        """
+        # override in child class
+        raise NotImplementedError
 
     def start(self, target=1):
         """ start proxies to reach target
@@ -57,4 +72,3 @@ class Proxy:
         :param n: number of proxies for which to wait
         """
         pass
-

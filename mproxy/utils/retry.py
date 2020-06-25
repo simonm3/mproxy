@@ -19,7 +19,9 @@ class Retry:
         self.tries = tries
         self.delay = delay
         self.exceptions = exceptions or Exception
-        if not (isinstance(self.exceptions, list) or isinstance(self.exceptions, tuple)):
+        if not (
+            isinstance(self.exceptions, list) or isinstance(self.exceptions, tuple)
+        ):
             self.exceptions = (self.exceptions,)
         self.warn = warn
 
@@ -33,9 +35,13 @@ class Retry:
                 except self.exceptions as e:
                     last_exception = type(e)
                     if self.warn > 0:
-                        log.warning(f"waiting for {func.__module__}.{func.__name__} tries={n+1}")
+                        log.warning(
+                            f"waiting for {func.__module__}.{func.__name__} tries={n+1}"
+                        )
                         self.warn -= 1
                     sleep(self.delay)
-            raise last_exception(f"failed {func.__module__}.{func.__name__} tries={n+1}")
-        return inner
+            raise last_exception(
+                f"failed {func.__module__}.{func.__name__} tries={n+1}"
+            )
 
+        return inner

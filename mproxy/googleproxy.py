@@ -1,17 +1,18 @@
 import logging
 
 from .google import Google
-from .proxyaws import ProxyException
+from .proxy import ProxyException
 from .utils import Retry
 
 log = logging.getLogger(__name__)
 
-class GoogleAWS(Google):
-    """ google using aws or awsnord proxy
+
+class GoogleProxy(Google):
+    """ google using proxy
 
     Usage::
 
-        s = Google(manager)
+        s = Google(proxy)
         s.search("something")
     """
 

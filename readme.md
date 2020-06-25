@@ -2,7 +2,7 @@ Mproxy
 ======
 
 This enables http requests via proxies that are automatically replaced if blocked.
-The proxies run on AWS and cost less than 1c/hour/proxy.
+The proxies run on ProxyAWS and cost less than 1c/hour/proxy.
 
 Installation
 ------------
@@ -20,12 +20,15 @@ See nbs folder for example::
     
 Multiprocessing usage::
 
+    from mproxy.utils import create_server, create_client
+
     # for main process
-    m = Mproxy.create_server()
+    p = ProxyAWS()
+    m = create_server(p)
     
     # for other processes
-    m = Mproxy.create_client()
-    s = Search(m)
+    p = create_client()
+    s = Googleproxy(p)
     r = s.search("some stuff")
 
    

@@ -20,14 +20,14 @@
 from time import sleep
 
 import requests
-
 from fake_useragent import UserAgent
+
 from ipstartup import *
-from mproxy import Mproxy, Search, Stypes
+from mproxy import Google, ProxyAWS, Stypes
 
 # %%
 # start two proxy servers
-m = Mproxy()
+m = ProxyAWS()
 m.start(2)
 m.wait(2)
 
