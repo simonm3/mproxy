@@ -34,7 +34,7 @@ class Google:
     def search(
         self,
         query,
-        n=10,
+        n=99,
         start=1,
         lang="en",
         after=None,
@@ -48,13 +48,13 @@ class Google:
         :param n: number of results. 99/page so 100 returns 198.
         :param start: index of first result
         :param lang: language
-        :param after: YYYYMMDD; YYYY-MM-DD; python date. default is 365 days before today.
-        :param before: YYYYMMDD; YYYY-MM-DD; python date. default is today.
+        :param after: YYYYMMDD; YYYY-MM-DD; python date
+        :param before: YYYYMMDD; YYYY-MM-DD; python date
         :param site: e.g. www.guardian.co.uk
         :param stype: from search.Stypes. type of search e.g. video
         :return: list of urls
 
-        searches are location specific based on ip address (tld and country are ignored)
+        searches are location specific based on ip address (google ignores tld and country)
         can change location in settings but this is encrypted so unclear how to encode
         """
 
@@ -65,20 +65,10 @@ class Google:
                     d = datetime.strptime(d, "%Y-%m-%d")
                 else:
                     d = datetime.strptime(d, "%Y%m%d")
-            return d
+            return d.strftime("%Y-%m-%d")
 
         after = get_date(after)
         before = get_date(before)
-
-        # defaults
-        if not before:
-            before = datetime.today()
-        if not after:
-            after = before - timedelta(days=365)
-
-        # convert to str
-        after = after.strftime("%Y-%m-%d")
-        before = before.strftime("%Y-%m-%d")
 
         if before:
             query = f"before:{before} {query}"
@@ -97,31 +87,25 @@ class Google:
         urls = []
         while True:
             # get page. must be https to include date search.
-            r = self._get(f"https://google.com{path}", params=params)
+            r = self.get(f"https://google.com{path}", params=params)
+            log.info(r.url)
 
             # extract urls from page
             soup = BeautifulSoup(r.text, "lxml")
-            urls.extend(self._extract_urls(soup))
-
-            # dedupe
-            urls = list(dict.fromkeys(urls))
-
-            # limit reached
-            if len(urls) >= n:
-                break
+            urls.extend(self.extract_urls(soup))
 
             # next page
+            if len(urls) >= n:
+                break
             path = None
             params = None
             try:
                 path = soup.find(id="pnnext").get("href")
             except:
-                pass
-            if not path:
                 break
         return list(urls)
 
-    def _extract_urls(self, soup):
+    def extract_urls(self, soup):
         """ return search result urls from page """
         urls = []
         links = soup.findAll("a")
@@ -135,7 +119,9 @@ class Google:
             o = urlparse(url, "http")
             if o.netloc and "google" not in o.netloc:
                 urls.append(url)
+        # dedupe
+        urls = list(dict.fromkeys(urls))
         return urls
 
-    def _get(self, url, params):
+    def get(self, url, params):
         return self.session.get(url, params=params)

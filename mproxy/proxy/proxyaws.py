@@ -123,52 +123,56 @@ class ProxyAWS(Proxy):
     def start_instance(self):
         """ start instance in a thread
         """
-        t = Thread(target=self.start_thread, daemon=True)
-        t.start()
 
-    def start_thread(self):
-        """ start spot instance on aws running proxy server
-        """
-        # create instance
-        name = names.sample(1).item().lower()
+        def target():
+            """ start spot instance on aws running proxy server
+            """
+            # create instance
+            name = names.sample(1).item().lower()
 
-        i = Spot(f"{self.prefix}{name}", specfile=f"{HERE}/server.yaml")
-        i.persistent = False
+            i = Spot(f"{self.prefix}{name}", specfile=f"{HERE}/server.yaml")
+            i.persistent = False
 
-        ################################################################
+            ################################################################
 
-        # configure instance
-        i.set_connection()
-        i.connection.put(f"{HERE}/tinyproxy.conf")
-        i.run(
-            "sudo apt-get -qq update && "
-            "sudo apt-get -y -q install dos2unix tinyproxy && "
-            "dos2unix tinyproxy.conf && "
-            "sudo cp tinyproxy.conf /etc/tinyproxy/tinyproxy.conf && "
-            "sudo service tinyproxy restart &&",
-            hide="both",
-        )
-        i.connection.close()
-
-        # wait for proxy to be working
-        try:
-            self.check_proxy(i.public_ip_address)
-        except:
-            log.error(
-                f"Failed to start proxy for {i.instance_id} at {i.public_ip_address}"
+            # configure instance
+            i.set_connection()
+            i.connection.put(f"{HERE}/tinyproxy.conf")
+            i.run(
+                "sudo apt-get -qq update && "
+                "sudo apt-get -y -q install dos2unix tinyproxy && "
+                "dos2unix tinyproxy.conf && "
+                "sudo cp tinyproxy.conf /etc/tinyproxy/tinyproxy.conf && "
+                "sudo service tinyproxy restart &&",
+                hide="both",
             )
-            raise
+            i.connection.close()
 
-        # make available
-        i.set_tags(ready="True")
-        log.info(f" {i.public_ip_address} started")
+            # wait for proxy to be working
+            try:
+                self.check_proxy(i.public_ip_address)
+            except:
+                log.error(
+                    f"Failed to start proxy for {i.instance_id} at {i.public_ip_address}"
+                )
+                raise
 
-        # add to dataframe as master copy as aws is slow to update.
-        row = dict(
-            name=i.name, instance_id=i.instance_id, ip=i.public_ip_address, ready="True"
-        )
-        row = pd.DataFrame.from_dict([row])
-        self.df = pd.concat([self.df, row])
+            # make available
+            i.set_tags(ready="True")
+            log.info(f" {i.public_ip_address} started")
+
+            # add to dataframe as master copy as aws is slow to update.
+            row = dict(
+                name=i.name,
+                instance_id=i.instance_id,
+                ip=i.public_ip_address,
+                ready="True",
+            )
+            row = pd.DataFrame.from_dict([row])
+            self.df = pd.concat([self.df, row])
+
+        t = Thread(target=target, daemon=True)
+        t.start()
 
     @Retry(tries=99, delay=1, warn=99)
     def check_proxy(self, ip):

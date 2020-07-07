@@ -1,6 +1,7 @@
+from pathlib import Path
+
 from stem import Signal
 from stem.connection import connect
-from pathlib import Path
 
 from .proxy import Proxy
 
