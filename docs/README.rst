@@ -1,8 +1,15 @@
+Modules
+=======
+
+Manager - rotates proxies
+Proxy (AWS, AWSNord, Tor) - proxy server
+source (google, translate) - function to get data
+Task - wraps a source to capture ProxyException and maintain session.
+
 Installing tor as a service on windows
 ======================================
 
-To use tor with python/stem it must be installed as a service. Take care with these instructions as mistakes fail silently
-::
+To use tor with python/stem it must be installed as a service. Take care with these instructions as mistakes fail silently::
 
     open powershell in admin mode
     install tor into c:/ NOT program files as need write permissions
@@ -26,13 +33,7 @@ AWS             1c/hour => $7.20
 NordVPN         $3.50 + AWS cost
 Tor             0
 
-Class hierarchy
-===============
 
-Proxy
-    ProxyAWS
-        ProxyAWSNord
-    ProxyTor
 
 
 
