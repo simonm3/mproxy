@@ -20,33 +20,45 @@ See nbs/aws.ipynb for example::
     from mproxy import Manager, Task, AWS
     from mproxy.source import google
     m.add(AWS, 2)
-    
-    t = Task(m)
-    search = t.use_proxies(google.search)
+
+Option 1 - automatically replaces proxy and retries once (can increase tries param for get_proxy_function)
+    session = m.get_proxysession()
+    search = session.get_proxy_function(google.search)
     urls = search("trump", before="20200701", after="20200701")
+    
+    # onProxyException => raise ProxyException
+
+Option 2 - manual retry and exception handling:
+    session = m.get_proxysession()
+    urls = search(session, "trump", before="20200701", after="20200701")
+    
+    # onProxyException => session.replace(); handle retry
     
 Multiprocessing usage::
 
     from mproxy.utils import create_server, create_client
 
     # main process
-    m = Manager
+    m = Manager()
     m = create_server(m)
-    
+    m.add(AWS, 2)
     
     # other processes
     m = create_client()
-    t = Task(m)
-    search = t.use_proxies(google.search)
+    session = m.get_proxysession()
+    search = session.get_proxy_function(search)
+
     urls = search("trump", before="20200701", after="20200701")
+    # onProxyException => raise ProxyException
+    
 
 Modules
 -------
 
 Manager - rotates proxies
 Proxy (AWS, AWSNord, Tor) - proxy server
-source (google, translate) - function to get data
-Task - wraps a source to capture ProxyException and maintain session.    
+Session - requests session. get method traps ProxyException; replace method replaces proxy.
+source (google, translate) - function that takes a session parameter; raises ProxyException or calls session.replace() 
   
 
 Installing tor as a service on windows

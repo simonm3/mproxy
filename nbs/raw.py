@@ -17,6 +17,7 @@ from ipstartup import *
 import logging
 
 import requests
+from mproxy.source import google
 
 log = logging.getLogger(__name__)
 # -
@@ -25,3 +26,5 @@ log = logging.getLogger(__name__)
 s = requests.Session()
 urls = google.search(s, "trump", before="20200701", after="20200701")
 len(urls), urls[:10]
+
+

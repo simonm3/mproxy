@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import NodeState, Provider
 
+from .proxysession import ProxySession
 from .utils import Retry
 
 log = logging.getLogger(__name__)
@@ -32,19 +33,31 @@ class Manager:
             t = Thread(target=target, daemon=True)
             t.start()
 
+    def remove(self, ip=None):
+        """ treat as blocked. replace.
+        :param ip: url or ip
+        """
+        if ip is None:
+            try:
+                ip = list(self.proxies.keys())[0]
+            except IndexError:
+                log.warning("no proxies to remove")
+                return
+        ip = urlparse(ip).netloc.split(":")[0] if ip.startswith("http") else ip
+
+        proxy = self.proxies[ip]
+        del self.proxies[ip]
+        proxy.stop()
+        log.info(f"{ip} stopped after {proxy.counter} requests")
+
     def block(self, ip):
         """ treat as blocked. replace.
         :param ip: url or ip
         """
         ip = urlparse(ip).netloc.split(":")[0]
 
-        # remove blocked proxy
         proxy = self.proxies[ip]
-        del self.proxies[ip]
-        proxy.stop()
-        log.info(f"{ip} stopped after {proxy.counter} requests")
-
-        # add replacement of same class
+        self.remove(ip)
         self.add(proxy.__class__)
 
     def get_session(self):
@@ -57,6 +70,10 @@ class Manager:
         index = list(self.proxies.keys())[self.next]
         proxy = self.proxies[index]
         return proxy.session
+
+    def get_proxysession(self):
+        """ return session that will automatically switch proxies """
+        return ProxySession(self)
 
     def stop(self):
         """ stop all proxies """

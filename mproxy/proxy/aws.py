@@ -44,6 +44,10 @@ class AWS(Proxy):
             except IndexError:
                 pass
 
+    @classmethod
+    def get_instances(self):
+        return [n for n in lc.list_nodes()]
+
     def start(self):
         """ start node """
 
@@ -76,8 +80,8 @@ class AWS(Proxy):
         con.put(f"{HERE}/tinyproxy.conf")
         con.run(
             "sudo apt-get -qq update && "
-            "sudo apt-get -y -q install dos2unix tinyproxy && "
-            "dos2unix tinyproxy.conf && "
+            "sudo apt-get -y -qq install dos2unix tinyproxy && "
+            "dos2unix -q tinyproxy.conf && "
             "sudo cp tinyproxy.conf /etc/tinyproxy/tinyproxy.conf && "
             "sudo service tinyproxy restart",
             hide="both",

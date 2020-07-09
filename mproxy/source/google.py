@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 import requests
 from bs4 import BeautifulSoup
 
-from ..task import ProxyException
+from ..proxysession import ProxyException
 
 log = logging.getLogger(__name__)
 
