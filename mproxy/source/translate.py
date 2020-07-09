@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 class Translate:
     """ manager client for google translate
 
-    todo this does not currently work as google recognises proxy switches
+    todo NOT UPDATED TO FIT EVERYTHING ELSE> ALSO DOES NOT WORK AS GOOGLE SPOTS SWITCHES
 
     Usage::
 

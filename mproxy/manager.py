@@ -21,11 +21,11 @@ class Manager:
         # index of next proxy to select
         self.next = 0
 
-    def add(self, proxy_class, n=1):
+    def add(self, proxy_class, n=1, **params):
         """ add n proxies """
 
         def target():
-            proxy = proxy_class()
+            proxy = proxy_class(**params)
             ip = proxy.start()
             self.proxies[ip] = proxy
 
@@ -76,7 +76,7 @@ class Manager:
         return ProxySession(self)
 
     def get_proxy_function(self, func):
-        """ return function that replaces session and retries
+        """ return function that on ProxyException => replaces session and retries
         :param func: function to be wrapped. raises ProxyException
         :return: wrapped function that handles ProxyException.
         """
