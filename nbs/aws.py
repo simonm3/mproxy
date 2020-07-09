@@ -19,8 +19,7 @@ from mproxy.source import google
 # initialise
 m = Manager()
 m.add(AWS, 2)
-session = m.get_proxysession()
-search = session.get_proxy_function(google.search)
+search = m.get_proxy_function(google.search)
 
 # run searches
 urls = search("trump", before="20200701", after="20200701")

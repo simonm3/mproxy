@@ -71,9 +71,17 @@ class Manager:
         proxy = self.proxies[index]
         return proxy.session
 
-    def get_proxysession(self):
+    def get_proxy_session(self):
         """ return session that will automatically switch proxies """
         return ProxySession(self)
+
+    def get_proxy_function(self, func):
+        """ return function that replaces session and retries
+        :param func: function to be wrapped. raises ProxyException
+        :return: wrapped function that handles ProxyException.
+        """
+        s = ProxySession(self)
+        return s.get_proxy_function(func)
 
     def stop(self):
         """ stop all proxies """

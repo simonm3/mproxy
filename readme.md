@@ -21,18 +21,23 @@ See nbs/aws.ipynb for example::
     from mproxy.source import google
     m.add(AWS, 2)
 
-Option 1 - automatically replaces proxy and retries once (can increase tries param for get_proxy_function)
-    session = m.get_proxysession()
+Probably option 1 is most useful but YMMV.
+
+Option 1 - automatically replaces proxy and retries
+    search = m.get_proxy_function(google.search)
+    urls = search("trump", before="20200701", after="20200701")
+    # onProxyException => search function raises ProxyException
+
+Option 2 - manual retry and exception handling. more control and access to current session:
+    session = m.get_proxy_session()
+    urls = search(session, "trump", before="20200701", after="20200701")
+    # onProxyException => search function calls session.replace(); handles retries.
+
+Option 3 - automatic but with access to session
+    session = m.get_proxy_session()
     search = session.get_proxy_function(google.search)
     urls = search("trump", before="20200701", after="20200701")
-    
-    # onProxyException => raise ProxyException
-
-Option 2 - manual retry and exception handling:
-    session = m.get_proxysession()
-    urls = search(session, "trump", before="20200701", after="20200701")
-    
-    # onProxyException => session.replace(); handle retry
+    # onProxyException => search function raises ProxyException
     
 Multiprocessing usage::
 
