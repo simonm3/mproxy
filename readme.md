@@ -2,7 +2,8 @@ Mproxy
 ======
 
 This enables http requests via rotating proxies that are automatically replaced if blocked.
-AWS proxies cost less than 1c/hour/proxy OR one can use an existing NordVPN account
+AWS proxies cost less than 1c/hour/proxy OR one can use an existing NordVPN account (NOTE I have not tested the NordVPN code so may need to be adapted to work!).
+
 It can easily be adapted to other cloud or VPN providers
 
 Installation
