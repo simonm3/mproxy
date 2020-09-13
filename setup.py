@@ -12,10 +12,10 @@ params = dict(
     version='0.0.3',
     url='https://github.com/simonm3/mproxy.git',
     install_requires=['googletrans', 'beautifulsoup4',
-                      'requests', 'stem', 'pandas'],
-    packages=['mproxy', 'mproxy.proxy', 'mproxy.utils'],
-    package_data={'mproxy': ['server.yaml', 'tinyproxy.conf'],
-                  'mproxy/proxy': ['babies-first-names-top-100-girls.csv']},
+                      'apache_libcloud', 'stem', 'requests', 'pandas', 'fabric'],
+    packages=['mproxy', 'mproxy.proxy', 'mproxy.source', 'mproxy.utils'],
+    package_data={
+        'mproxy/proxy': ['babies-first-names-top-100-girls.csv', 'tinyproxy.conf']},
     include_package_data=True,
     py_modules=[],
     scripts=None)
