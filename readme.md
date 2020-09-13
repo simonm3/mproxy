@@ -24,21 +24,23 @@ See nbs/aws.ipynb for example::
 
 Probably option 1 is most useful but YMMV.
 
-Option 1 - automatically replaces proxy and retries
+Option 1 - automatically replaces proxy and retries::
+
+    # google.search raises ProxyException. Wrapper handles exception.
     search = m.get_proxy_function(google.search)
     urls = search("trump", before="20200701", after="20200701")
-    # onProxyException => search function raises ProxyException
 
-Option 2 - manual retry and exception handling. more control and access to current session:
+Option 2 - manual retry and exception handling. more control and access to current session::
+
     session = m.get_proxy_session()
+    # "search" function identifies failure; calls session.replace(); handles retries.
     urls = search(session, "trump", before="20200701", after="20200701")
-    # onProxyException => search function calls session.replace(); handles retries.
 
-Option 3 - automatic but with access to session
+Option 3 - automatic but with access to session::
+
     session = m.get_proxy_session()
     search = session.get_proxy_function(google.search)
     urls = search("trump", before="20200701", after="20200701")
-    # onProxyException => search function raises ProxyException
     
 Multiprocessing usage::
 

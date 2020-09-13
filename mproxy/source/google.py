@@ -76,7 +76,7 @@ def search(
     while True:
         # get page. must be https to include date search.
         r = session.get(f"https://google.com{path}", params=params)
-        log.info(r.url)
+        log.debug(r.url)
         if r.status_code != 200:
             raise ProxyException
 
