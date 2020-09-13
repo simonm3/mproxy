@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,py:light
 #     text_representation:
 #       extension: .py
 #       format_name: light
@@ -21,17 +22,11 @@ m = Manager()
 m.add(AWS, 2)
 search = m.get_proxy_function(google.search)
 
-for _ in range(2):
-    print(m.get_session().get("https://api.ipify.org").text)
-
 # run searches
 urls = search("trump", before="20200701", after="20200701")
 len(urls), urls[:10]
 
-# remove a single proxy
 m.remove()
 
 # stop proxies
 m.stop()
-
-
