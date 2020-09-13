@@ -16,11 +16,7 @@ Installation
 Usage
 -----
 
-See nbs/aws.ipynb for example::
-
-    from mproxy import Manager, Task, AWS
-    from mproxy.source import google
-    m.add(AWS, 2)
+See nbs/aws.ipynb for example.
 
 Probably option 1 is most useful but YMMV.
 
