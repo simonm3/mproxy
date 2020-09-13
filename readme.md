@@ -16,7 +16,11 @@ Installation
 Usage
 -----
 
-See nbs/aws.ipynb for example.
+See nbs/aws.ipynb for example::
+
+    from mproxy import Manager, AWS
+    from mproxy.source import google
+    m.add(AWS, 2)
 
 Probably option 1 is most useful but YMMV.
 
