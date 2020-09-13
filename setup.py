@@ -9,10 +9,10 @@ from setuptools import setup
 params = dict(
     name='mproxy',
     description='Mproxy',
-    version='0.0.4',
+    version='0.0.5',
     url='https://github.com/simonm3/mproxy.git',
-    install_requires=['stem', 'fabric', 'googletrans',
-                      'apache_libcloud', 'beautifulsoup4', 'requests', 'pandas'],
+    install_requires=['apache_libcloud', 'fabric', 'googletrans',
+                      'beautifulsoup4', 'pandas', 'requests', 'stem'],
     packages=['mproxy', 'mproxy.proxy', 'mproxy.source', 'mproxy.utils'],
     package_data={
         'mproxy/proxy': ['babies-first-names-top-100-girls.csv', 'tinyproxy.conf']},
